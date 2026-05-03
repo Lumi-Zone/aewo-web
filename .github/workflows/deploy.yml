@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   workflow_dispatch:
 
 permissions:
@@ -17,6 +17,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # Ensures Astro sees the real repo slug (e.g. aevo-web) for import.meta.env.BASE_URL.
+      GITHUB_REPOSITORY: ${{ github.repository }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,11 +33,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Must run before static build so Pages injects config; see actions/configure-pages docs.
+      - name: Configure Pages
+        uses: actions/configure-pages@v4
+
       - name: Build
         run: npm run build
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

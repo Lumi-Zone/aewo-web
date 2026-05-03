@@ -19,11 +19,16 @@ const {
   noindex = false,
 } = Astro.props;
 
-const baseUrl = import.meta.env.BASE_URL;
-const siteUrl = Astro.site?.toString() ?? 'https://aevo-ada-pruefung.de/';
+const rawBase = import.meta.env.BASE_URL;
+const baseUrl = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
+const siteOrigin = Astro.site
+  ? `${new URL(Astro.site).origin}/`
+  : 'https://aevo-ada-pruefung.de/';
+const publicRoot = new URL(baseUrl, siteOrigin);
+const siteUrl = siteOrigin;
 const currentPath = Astro.url.pathname;
-const canonicalHref = canonical ?? new URL(currentPath, siteUrl).href;
-const ogImage = new URL('og-image.png', siteUrl).href;
+const canonicalHref = canonical ?? new URL(currentPath, publicRoot).href;
+const ogImage = new URL('og-image.png', publicRoot).href;
 const robotsContent = noindex
   ? 'noindex, nofollow'
   : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
