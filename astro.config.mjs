@@ -4,16 +4,21 @@ import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
 
 /**
- * GitHub Actions sets GITHUB_REPOSITORY=owner/repo. Project sites are served at
- * https://owner.github.io/repo/ — Astro needs matching `base` or assets and routes break.
- * Local dev: no env → base "/" and a stable public URL for SEO fallbacks.
+ * GitHub Pages serves project sites from /repo/, but custom domains are served
+ * from /. The deploy workflow sets CUSTOM_DOMAIN so Astro emits root-relative
+ * asset URLs for aevo-ada-pruefung.de.
  */
 function pagesConfig() {
+  const customDomain = process.env.CUSTOM_DOMAIN;
+  if (customDomain) {
+    return { site: `https://${customDomain}`, base: '/' };
+  }
+
   const full = process.env.GITHUB_REPOSITORY;
   if (!full?.includes('/')) {
-    // Local / preview: origin only; CI sets base to /aevo-web/ via GITHUB_REPOSITORY.
-    return { site: 'https://lumi-zone.github.io', base: '/' };
+    return { site: 'https://aevo-ada-pruefung.de', base: '/' };
   }
+
   const [owner, repo] = full.split('/');
   return {
     site: `https://${owner}.github.io`,

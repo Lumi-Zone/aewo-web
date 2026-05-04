@@ -18,7 +18,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      # Ensures Astro sees the real repo slug (e.g. aevo-web) for import.meta.env.BASE_URL.
+      # Custom domains are served from /, so Astro must not prefix assets with /aevo-web/.
+      CUSTOM_DOMAIN: aevo-ada-pruefung.de
+      # Fallback for non-custom-domain deploys; Astro uses this only when CUSTOM_DOMAIN is unset.
       GITHUB_REPOSITORY: ${{ github.repository }}
     steps:
       - name: Checkout
